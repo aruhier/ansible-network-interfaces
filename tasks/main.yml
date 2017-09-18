@@ -20,9 +20,6 @@
   when: network_interfaces
   with_items: "{{ network_interface_required_packages }}"
 
-- include: all_interfaces.yml
-  when: network_interfaces
-
 - name: configurations
   template:
     src: device.j2
@@ -34,6 +31,24 @@
   notify:
   - network restart interface service
   - network restart interface command
+
+- name: list existing files
+  command: "find {{ network_interface_path }} -type f"
+  changed_when: no
+  register: network_existing_files
+
+# depending on change the result stores dest or path
+# check mode doesn't store any of those so use module args
+- name: configured files
+  set_fact:
+    network_configured_files: >-
+      [{% for item in network_configuration_result.results | default([]) -%}
+        "{{ item.dest | default(item.path) | default(item.invocation.module_args.dest) }}"
+        {{ '' if loop.last else ',' }}
+      {%- endfor %}]
+
+- include: all_interfaces.yml
+  when: network_interfaces
 
 - include: manage_devices.yml
   when:

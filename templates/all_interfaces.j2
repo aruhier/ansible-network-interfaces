@@ -2,4 +2,6 @@
 auto lo
 iface lo inet loopback
 
-source {{ network_interface_path }}/*
+{% for i in network_configured_files|default([]) %}
+source {{ i }}
+{% endfor %}
