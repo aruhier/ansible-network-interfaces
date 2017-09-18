@@ -1,0 +1,5 @@
+---
+network_interface_required_packages: []
+
+network_service: "networking"
+network_restart_method: "interface"
