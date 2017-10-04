@@ -3,7 +3,7 @@ auto lo
 iface lo inet loopback
 
 {% for i in network_interfaces | default([]) | groupby('device') %}
-auto {{ d.0 }}
+auto {{ i.0 }}
 {% endfor %}
 
 {% for item in network_interfaces | default([]) | groupby('device') %}
