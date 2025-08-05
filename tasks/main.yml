@@ -17,7 +17,7 @@
     state: present
     update_cache: yes
     cache_valid_time: 86400
-  when: network_interfaces
+  when: network_interfaces | length > 0
   with_items: "{{ network_interface_required_packages }}"
 
 - name: configurations
@@ -26,7 +26,7 @@
     dest: "{{ network_interface_path }}/device-{{ item.0 }}"
     mode: "{{ network_interface_permissions }}"
   with_items:
-  - "{{ network_interfaces | default([]) | groupby('device') }}"
+  - "{{ network_interfaces | default([]) | groupby('device') | map('list') | list }}"
   register: network_configuration_result
   notify:
   - network restart interface service
@@ -48,9 +48,9 @@
       {%- endfor %}]
 
 - include_tasks: all_interfaces.yml
-  when: network_interfaces
+  when: network_interfaces | length > 0
 
 - include_tasks: manage_devices.yml
   when:
   - network_manage_devices
-  - network_interfaces
+  - network_interfaces | length > 0
